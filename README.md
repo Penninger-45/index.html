@@ -1,5 +1,3 @@
-# index.html
-Ms. P's Daily Hub
 <!DOCTYPE html>
 <html lang="en">
 <head>

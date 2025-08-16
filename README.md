@@ -390,15 +390,13 @@
             </div>
             <div class="card">
                 <h2><span class="emoji-icon">🧠</span>Learning Objective</h2>
-                <textarea id="learningObjective" placeholder="Type or generate today's learning objective..."></textarea>
- 
+                <textarea id="learningObjective" placeholder="Type today's learning objective..."></textarea>
             </div>
 
             <!-- Row 2 -->
             <div class="card">
                 <h2><span class="emoji-icon">🤝</span>Check and Connect</h2>
-                <textarea id="doNow" placeholder="Enter or generate the 'Do Now' activity..."></textarea>
-
+                <textarea id="doNow" placeholder="Enter the 'Do Now' activity..."></textarea>
                 <div style="margin-top: auto;">
                     <a href="https://edtomorrow.com" target="_blank" class="connect-link">Go to edtomorrow.com</a>
                 </div>
@@ -410,29 +408,31 @@
                     <p>Click to upload a meme or photo!</p>
                 </div>
                 <button id="removeMemeBtn" class="remove-btn">Remove Photo</button>
-
+                <div class="gemini-feature">
+                    <button id="generate-prompt-btn" class="gemini-btn">✨ Generate Writing Prompt</button>
+                    <div class="loader">Analyzing image...</div>
+                    <div class="gemini-result-box" id="prompt-result" style="display: none;"></div>
+                </div>
             </div>
 
             <!-- Row 3 -->
             <div class="card">
                 <h2><span class="emoji-icon">🏛️</span>On This Day</h2>
-                <p>Discover a historical event from today's date.</p>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <a href="https://www.britannica.com/on-this-day" target="_blank" class="nyt-link" style="margin-top: 0; flex: 1;">Britannica: On This Day</a>
-                    <a href="https://www.britannica.com/one-good-fact" target="_blank" class="nyt-link" style="margin-top: 0; flex: 1;">One Good Fact</a>
-                </div>
-
+                <p>Discover historical events and educational facts from today's date.</p>
+                <a href="https://www.britannica.com/on-this-day" target="_blank" class="nyt-link">On This Day</a>
+                <a href="https://www.britannica.com/one-good-fact" target="_blank" class="nyt-link">One Good Fact</a>
             </div>
             <div class="card">
-                <h2><span class="emoji-icon">📰</span>The Kids Should See This</h2>
+                <h2><a href="https://thekidshouldseethis.com/" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center;"><span class="emoji-icon">📺</span>The Kids Should See This</a></h2>
                 <div id="rss-feed" class="rss-feed">
                     <p>Loading the latest educational videos...</p>
                 </div>
+                <a href="https://ed.ted.com/" target="_blank" class="nyt-link">TED-Ed Videos</a>
             </div>
             
             <!-- Row 4 -->
             <div class="card">
-                <h2><span class="emoji-icon">🗞️</span>NYT Learning Network</h2>
+                <h2><a href="https://www.nytimes.com/section/learning" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center;"><span class="emoji-icon">🗞️</span>NYT Learning Network</a></h2>
                 <a href="https://www.nytimes.com/column/learning-student-opinion" target="_blank" class="nyt-link">Student Opinion Questions</a>
                 <a href="https://www.nytimes.com/spotlight/accessible-activities" target="_blank" class="nyt-link">Picture Prompts</a>
                 <a href="https://www.nytimes.com/column/learning-word-of-the-day" target="_blank" class="nyt-link">Word of the Day</a>
@@ -582,15 +582,19 @@
                 memePlaceholder.classList.remove('has-image');
                 memeInput.value = '';
                 removeMemeBtn.style.display = 'none';
+                genPromptBtn.style.display = 'none';
+                promptResultBox.style.display = 'none';
             });
         }
         
         function displayImage(imageUrl) {
             const memePlaceholder = document.getElementById('meme-placeholder');
             const removeMemeBtn = document.getElementById('removeMemeBtn');
+            const genPromptBtn = document.getElementById('generate-prompt-btn');
             memePlaceholder.innerHTML = `<img src="${imageUrl}" alt="Uploaded Meme">`;
             memePlaceholder.classList.add('has-image');
             removeMemeBtn.style.display = 'block';
+            genPromptBtn.style.display = 'block';
         }
 
         async function fetchRssFeed() {
@@ -667,11 +671,11 @@
         async function callGeminiApi(payload, loaderElement, maxRetries = 3) {
             if (loaderElement) loaderElement.style.display = 'block';
             
-            // Add your Gemini API key here - Get one free at https://aistudio.google.com/
-            const apiKey = ""; // Paste your API key between the quotes
-            if (!apiKey || apiKey.trim() === "") {
+            // Note: Add your Gemini API key here for the AI features to work
+            const apiKey = "YOUR_GEMINI_API_KEY_HERE";
+            if (!apiKey || apiKey === "YOUR_GEMINI_API_KEY_HERE") {
                 if (loaderElement) loaderElement.style.display = 'none';
-                return "🔑 To enable AI features, get a free API key at https://aistudio.google.com/ and paste it in the code where it says 'Paste your API key between the quotes'";
+                return "Please add your Gemini API key to enable AI features.";
             }
             
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
@@ -707,9 +711,22 @@
         }
 
         function initializeGeminiFeatures() {
-            document.getElementById('generate-objective-btn').addEventListener('click', async () => {
-                const topic = document.getElementById('objective-topic').value.trim();
-                if (!topic) return;
-                const prompt = `Generate a concise, student-facing learning objective for a middle school class. The objective should start with "Students will be able to...". Topic: "${topic}".`;
-                const payload = { contents: [{ parts: [{ text: prompt }] }] };
-                const loader = document.querySelector('#generate-objective-btn').parentElement.nextElementSibling
+            document.getElementById('generate-prompt-btn').addEventListener('click', async () => {
+                const imageEl = document.querySelector('#meme-placeholder img');
+                if (!imageEl || !imageEl.src) return;
+                const base64ImageData = imageEl.src.split(',')[1];
+                const mimeType = imageEl.src.match(/data:(.*);/)[1];
+                const prompt = "Generate a short, creative writing prompt based on this image for a middle school student.";
+                const payload = { contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType, data: base64ImageData } }] }] };
+                const loader = document.querySelector('#generate-prompt-btn').nextElementSibling;
+                const resultBox = document.getElementById('prompt-result');
+                resultBox.innerHTML = '';
+                const result = await callGeminiApi(payload, loader);
+                resultBox.innerHTML = result.replace(/\n/g, '<br>');
+                resultBox.style.display = 'block';
+            });
+        }
+    });
+    </script>
+</body>
+</html>

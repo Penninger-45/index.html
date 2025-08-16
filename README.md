@@ -72,10 +72,11 @@
         }
         
         .header .subtitle {
-            color: var(--text-secondary);
+            color: #ffffff;
             margin: 10px 0 0;
             font-size: 1.2em;
-            font-weight: 400;
+            font-weight: 600;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
         }
         
         .grid-container {
@@ -398,7 +399,7 @@
                 <h2><span class="emoji-icon">🤝</span>Check and Connect</h2>
                 <textarea id="doNow" placeholder="Enter the 'Do Now' activity..."></textarea>
                 <div style="margin-top: auto;">
-                    <a href="https://edtomorrow.com" target="_blank" class="connect-link">Go to edtomorrow.com</a>
+                    <a href="https://edtomorrow.com" target="_blank" class="connect-link">First Five</a>
                 </div>
             </div>
             <div class="card">
@@ -408,11 +409,6 @@
                     <p>Click to upload a meme or photo!</p>
                 </div>
                 <button id="removeMemeBtn" class="remove-btn">Remove Photo</button>
-                <div class="gemini-feature">
-                    <button id="generate-prompt-btn" class="gemini-btn">✨ Generate Writing Prompt</button>
-                    <div class="loader">Analyzing image...</div>
-                    <div class="gemini-result-box" id="prompt-result" style="display: none;"></div>
-                </div>
             </div>
 
             <!-- Row 3 -->
@@ -427,10 +423,17 @@
                 <div id="rss-feed" class="rss-feed">
                     <p>Loading the latest educational videos...</p>
                 </div>
-                <a href="https://ed.ted.com/" target="_blank" class="nyt-link">TED-Ed Videos</a>
             </div>
             
             <!-- Row 4 -->
+            <div class="card">
+                <h2><a href="https://ed.ted.com/" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center;"><span class="emoji-icon">🎓</span>TED-Ed Videos</a></h2>
+                <p>Explore engaging educational videos covering science, history, literature, and more.</p>
+                <a href="https://ed.ted.com/lessons?category=science" target="_blank" class="nyt-link">Science Lessons</a>
+                <a href="https://ed.ted.com/lessons?category=literature-language" target="_blank" class="nyt-link">Literature & Language</a>
+                <a href="https://ed.ted.com/lessons?category=history-social-studies" target="_blank" class="nyt-link">History & Social Studies</a>
+                <a href="https://ed.ted.com/lessons?category=mathematics" target="_blank" class="nyt-link">Mathematics</a>
+            </div>
             <div class="card">
                 <h2><a href="https://www.nytimes.com/section/learning" target="_blank" style="color: inherit; text-decoration: none; display: flex; align-items: center;"><span class="emoji-icon">🗞️</span>NYT Learning Network</a></h2>
                 <a href="https://www.nytimes.com/column/learning-student-opinion" target="_blank" class="nyt-link">Student Opinion Questions</a>
@@ -562,8 +565,6 @@
             const memePlaceholder = document.getElementById('meme-placeholder');
             const memeInput = document.getElementById('memeInput');
             const removeMemeBtn = document.getElementById('removeMemeBtn');
-            const genPromptBtn = document.getElementById('generate-prompt-btn');
-            const promptResultBox = document.getElementById('prompt-result');
 
             memePlaceholder.addEventListener('click', () => memeInput.click());
 
@@ -582,19 +583,15 @@
                 memePlaceholder.classList.remove('has-image');
                 memeInput.value = '';
                 removeMemeBtn.style.display = 'none';
-                genPromptBtn.style.display = 'none';
-                promptResultBox.style.display = 'none';
             });
         }
         
         function displayImage(imageUrl) {
             const memePlaceholder = document.getElementById('meme-placeholder');
             const removeMemeBtn = document.getElementById('removeMemeBtn');
-            const genPromptBtn = document.getElementById('generate-prompt-btn');
             memePlaceholder.innerHTML = `<img src="${imageUrl}" alt="Uploaded Meme">`;
             memePlaceholder.classList.add('has-image');
             removeMemeBtn.style.display = 'block';
-            genPromptBtn.style.display = 'block';
         }
 
         async function fetchRssFeed() {
@@ -711,20 +708,7 @@
         }
 
         function initializeGeminiFeatures() {
-            document.getElementById('generate-prompt-btn').addEventListener('click', async () => {
-                const imageEl = document.querySelector('#meme-placeholder img');
-                if (!imageEl || !imageEl.src) return;
-                const base64ImageData = imageEl.src.split(',')[1];
-                const mimeType = imageEl.src.match(/data:(.*);/)[1];
-                const prompt = "Generate a short, creative writing prompt based on this image for a middle school student.";
-                const payload = { contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType, data: base64ImageData } }] }] };
-                const loader = document.querySelector('#generate-prompt-btn').nextElementSibling;
-                const resultBox = document.getElementById('prompt-result');
-                resultBox.innerHTML = '';
-                const result = await callGeminiApi(payload, loader);
-                resultBox.innerHTML = result.replace(/\n/g, '<br>');
-                resultBox.style.display = 'block';
-            });
+            // No Gemini features needed anymore
         }
     });
     </script>

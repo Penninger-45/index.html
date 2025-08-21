@@ -318,8 +318,11 @@
                 </div>
                  <div class="card">
                     <h2><span class="title-text"><span class="emoji-icon">📰</span><a href="https://thekidshouldseethis.com/" target="_blank">The Kids Should See This</a></span></h2>
-                    <div id="rss-feed" class="rss-feed" style="flex-grow: 1;">
-                        <p>Loading educational content...</p>
+                    <div class="link-list" style="margin-top:auto;">
+                        <a href="https://thekidshouldseethis.com/music" target="_blank">Music</a>
+                        <a href="https://thekidshouldseethis.com/art" target="_blank">Art</a>
+                        <a href="https://thekidshouldseethis.com/tagged/humor" target="_blank">Funny</a>
+                        <a href="https://thekidshouldseethis.com/tagged/stop-motion" target="_blank">Stop-Motion</a>
                     </div>
                 </div>
                 <div class="card">
@@ -700,30 +703,6 @@
                 calcDisplay.textContent = calcValue;
             }));
 
-            // --- RSS FEED ---
-            const rssFeedContainer = document.getElementById('rss-feed');
-            function loadStaticRssFeed() {
-                const staticFeedContent = `
-                    <div class="rss-item">
-                        <a href="https://thekidshouldseethis.com/post/how-do-geckos-defy-gravity" target="_blank">How do geckos defy gravity?</a>
-                        <p>A deep dive into the amazing adhesive powers of gecko feet, using van der Waals forces to stick to almost any surface...</p>
-                    </div>
-                    <div class="rss-item">
-                        <a href="https://thekidshouldseethis.com/post/the-surprising-science-of-why-lakes-and-oceans-dont-freeze-solid" target="_blank">The surprising science of why lakes and oceans don’t freeze solid</a>
-                        <p>Explore the unique properties of water and how its density changes as it cools, protecting aquatic life in the winter...</p>
-                    </div>
-                    <div class="rss-item">
-                        <a href="https://thekidshouldseethis.com/post/a-brief-history-of-the-number-zero" target="_blank">A brief history of the number zero</a>
-                        <p>Where did the concept of 'nothing' come from? This video traces the fascinating and essential history of the number zero...</p>
-                    </div>
-                     <div class="rss-item">
-                        <a href="https://thekidshouldseethis.com/post/the-worlds-deepest-fish-pseudoliparis-belyaevi" target="_blank">The World's Deepest Fish</a>
-                        <p>Scientists capture footage of the Pseudoliparis belyaevi, a species of snailfish, swimming 8,336 meters (5.1 miles) deep...</p>
-                    </div>
-                `;
-                rssFeedContainer.innerHTML = staticFeedContent;
-            }
-
             // --- ARCHIVE & EXPORT LOGIC ---
             const archiveDisplay = document.getElementById('archive-display');
             const submitToArchiveBtn = document.getElementById('submit-to-archive-btn');
@@ -955,7 +934,6 @@
             }
             loadData();
             loadArchives();
-            loadStaticRssFeed();
         });
     </script>
 </body>

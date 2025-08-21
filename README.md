@@ -949,7 +949,8 @@
             const generateDonowBtn = document.getElementById('generate-donow-btn');
             const donowLoader = document.getElementById('donow-loader');
 
-            async function callGemini(prompt) {
+            async function callGemini(prompt, loaderElement) {
+                loaderElement.style.display = 'block';
                 try {
                     let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
                     const payload = { contents: chatHistory };
@@ -965,12 +966,14 @@
                     if (result.candidates && result.candidates[0].content.parts[0].text) {
                         return result.candidates[0].content.parts[0].text;
                     } else {
-                        return "Sorry, could not generate a response. Please try again.";
+                        throw new Error("Invalid response structure from API.");
                     }
                 } catch (error) {
                     console.error("Error calling Gemini:", error);
                     showNotification("Error: Could not connect to the AI service.");
                     return "An error occurred while generating content.";
+                } finally {
+                    loaderElement.style.display = 'none';
                 }
             }
 
@@ -980,21 +983,17 @@
                     showNotification("Please enter a topic for the objective.");
                     return;
                 }
-                objectiveLoader.style.display = 'block';
                 const prompt = `Generate a concise student learning objective for the topic: "${topic}". Frame it as "Students will be able to..."`;
-                const result = await callGemini(prompt);
+                const result = await callGemini(prompt, objectiveLoader);
                 learningObjective.value = result;
                 saveData();
-                objectiveLoader.style.display = 'none';
             });
 
             generateDonowBtn.addEventListener('click', async () => {
-                donowLoader.style.display = 'block';
                 const prompt = `Generate a short, engaging "Check and Connect" or "Do Now" question for a middle school class. The question should be a thought-provoking conversation starter.`;
-                const result = await callGemini(prompt);
+                const result = await callGemini(prompt, donowLoader);
                 doNow.value = result;
                 saveData();
-                donowLoader.style.display = 'none';
             });
 
 

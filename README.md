@@ -942,6 +942,62 @@
                 }
             }
 
+            // --- GEMINI API CALLS ---
+            const generateObjectiveBtn = document.getElementById('generate-objective-btn');
+            const objectiveTopicInput = document.getElementById('objective-topic');
+            const objectiveLoader = document.getElementById('objective-loader');
+            const generateDonowBtn = document.getElementById('generate-donow-btn');
+            const donowLoader = document.getElementById('donow-loader');
+
+            async function callGemini(prompt) {
+                try {
+                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates[0].content.parts[0].text) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        return "Sorry, could not generate a response. Please try again.";
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini:", error);
+                    showNotification("Error: Could not connect to the AI service.");
+                    return "An error occurred while generating content.";
+                }
+            }
+
+            generateObjectiveBtn.addEventListener('click', async () => {
+                const topic = objectiveTopicInput.value.trim();
+                if (!topic) {
+                    showNotification("Please enter a topic for the objective.");
+                    return;
+                }
+                objectiveLoader.style.display = 'block';
+                const prompt = `Generate a concise student learning objective for the topic: "${topic}". Frame it as "Students will be able to..."`;
+                const result = await callGemini(prompt);
+                learningObjective.value = result;
+                saveData();
+                objectiveLoader.style.display = 'none';
+            });
+
+            generateDonowBtn.addEventListener('click', async () => {
+                donowLoader.style.display = 'block';
+                const prompt = `Generate a short, engaging "Check and Connect" or "Do Now" question for a middle school class. The question should be a thought-provoking conversation starter.`;
+                const result = await callGemini(prompt);
+                doNow.value = result;
+                saveData();
+                donowLoader.style.display = 'none';
+            });
+
+
             // Initial Load
             if (!checkLocalStorage()) {
                 showNotification("Warning: Browser storage is disabled. Your work will not be saved.");
